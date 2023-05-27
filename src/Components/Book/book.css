@@ -1,0 +1,36 @@
+.book-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .payment-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .room-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+  
+  .room-status {
+    font-weight: bold;
+  }
+  
+  .room-status.red {
+    color: red;
+  }
+  
+  .room-status.green {
+    color: green;
+  }
+  
+  @media screen and (max-width: 600px) {
+    .payment-card {
+      padding: 5px;
+    }
+  }
+   
