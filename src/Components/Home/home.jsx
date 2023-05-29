@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../../config/firebase';
+
 import {
   addDoc,
   collection,
@@ -17,11 +18,14 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper';
 
 import 'swiper/swiper.min.css';
+import Footer from '../Footer/footer';
+import Loader from '../Loader/Loader';
 
 SwiperCore.use([Navigation, Pagination, Autoplay]);
 
 const Home = () => {
   const [rooms, setRooms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
@@ -47,7 +51,7 @@ const Home = () => {
           ...doc.data(),
         }));
         setRooms(roomData);
-
+        setIsLoading(false);
         // Create headerCarouselImages collection and push the first images
         const headerCarouselImagesCollection = collection(
           db,
@@ -65,6 +69,7 @@ const Home = () => {
       } catch (error) {
         console.log('Error fetching rooms:', error);
         setError('Error fetching rooms');
+        setIsLoading(false);
       }
     };
 
@@ -243,7 +248,10 @@ const Home = () => {
       <h2>Rooms</h2>
 
       <div className="room-container">
-        {rooms.map((room, index) => (
+      {isLoading ? (
+        <Loader />
+      ) : (
+        rooms.map((room, index) => (
           <div
             className="room-card"
             key={room.id}
@@ -259,6 +267,7 @@ const Home = () => {
               <p className="room-type">{room.type}</p>
             </div>
           </div>
+          )
         ))}
       </div>
 
@@ -398,7 +407,7 @@ const Home = () => {
   </div>
 )}
 
-
+<Footer/>
     </div>
   );
 };

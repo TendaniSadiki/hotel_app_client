@@ -78,9 +78,9 @@ export default function Profile() {
 
       {userProfile ? (
         <div className="user-profile">
-          <td>
+          
                   <img src={userProfile.image} alt="Profile" className="profile-image" />
-                </td>
+               
           <p>
             <FaEnvelope className="profile-icon" />
             Email: {userProfile.email}

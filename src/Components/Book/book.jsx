@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { auth, db } from '../../config/firebase';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import './book.css';
-
+import Footer from '../Footer/footer';
 export default function Book() {
   const [payments, setPayments] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
@@ -77,6 +77,7 @@ export default function Book() {
           </div>
         ))
       )}
+      <Footer/>
     </div>
   );
 }

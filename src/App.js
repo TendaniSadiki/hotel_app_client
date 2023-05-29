@@ -8,6 +8,8 @@ import Profile from './Components/Profile/profile';
 import Settings from './Components/Settings/settings';
 import Book from './Components/Book/book';
 import Loader from './Components/Loader/Loader.jsx';
+import { CgMenuRound, CgClose } from 'react-icons/cg';
+import HomeOffline from './Components/Home/offlineHandler';
 
 const Home = lazy(() => import('./Components/Home/home'));
 
@@ -55,7 +57,7 @@ function App() {
   const PrivateRoute = ({ element, path }) => {
     if (!user) {
       // User is not logged in, redirect to the login page
-      return <Navigate to="/login" />;
+      return <Navigate to="/home" />;
     }
 
     // User is logged in, render the specified element
@@ -65,16 +67,12 @@ function App() {
   return (
     <BrowserRouter>
       <nav>
-        <input
-          type="checkbox"
-          id="menu-toggle"
-          checked={isMobileMenuOpen}
-          onChange={toggleMobileMenu}
-        />
-        <label htmlFor="menu-toggle" className="menu-icon">
-          <span></span>
-          <span></span>
-          <span></span>
+        <label htmlFor="menu-toggle" className="menu-icon" onClick={toggleMobileMenu}>
+          {isMobileMenuOpen ? (
+            <CgClose className="icon" />
+          ) : (
+            <CgMenuRound className="icon" />
+          )}
         </label>
         <div className="logo">
           <Link to="/" onClick={closeMobileMenu}>
@@ -133,7 +131,7 @@ function App() {
             <>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="*" element={<Login/>} />
+              <Route path="*" element={<HomeOffline />} />
             </>
           ) : (
             <>
