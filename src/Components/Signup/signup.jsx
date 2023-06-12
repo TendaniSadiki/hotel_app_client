@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '../../config/firebase'; // Import the Firestore instance
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore'; // Import Firestore functions
-import './signup.css'; // Import the CSS file
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { auth, db } from '../../config/firebase';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import './signup.css';
 
-export default function Signup() {
+export default function Signup({ handleSwitchToLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [isEmailSent, setIsEmailSent] = useState(false);
 
   const handleSignup = async () => {
     try {
-      const auth = getAuth(); // Get the auth instance
-      // Create a new user with the provided email and password
-      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      const authInstance = getAuth();
+      const { user } = await createUserWithEmailAndPassword(authInstance, email, password);
 
-      // Add the user details to the users collection
       const userCollection = collection(db, 'users');
-      const userProfileDoc = doc(userCollection, user.uid); // Create a document reference with the user's UID
+      const userProfileDoc = doc(userCollection, user.uid);
       await setDoc(userProfileDoc, {
         email,
         username: '',
@@ -27,23 +26,31 @@ export default function Signup() {
         address: ''
       });
 
-      // Clear the form fields
       setEmail('');
       setPassword('');
       setError(null);
-      // Optionally, you can perform additional actions after successful signup
-      console.log('User signed up successfully!');
+
+      // Send email verification
+      await sendEmailVerification(authInstance.currentUser);
+
+      setIsEmailSent(true);
+      console.log('Email verification sent');
     } catch (error) {
-      // Handle signup errors
       setError(error.message);
       console.log('Error signing up:', error);
     }
   };
 
   return (
-    <div className="signup-container"> {/* Apply the container class */}
+    <div className="signup-container">
       <h2>Signup</h2>
-      {error && <p className="error-message">{error}</p>} {/* Apply the error-message class */}
+      {error && <p className="error-message">{error}</p>}
+      {isEmailSent && (
+        <div className="email-verification-modal">
+          <p>A verification email has been sent to your email address.</p>
+          <p>Please check your email and follow the instructions to verify your account.</p>
+        </div>
+      )}
       <label>Email:</label>
       <input
         type="email"
@@ -56,7 +63,11 @@ export default function Signup() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button className="signup-button" onClick={handleSignup}>Signup</button> {/* Apply the signup-button class */}
+      <button className="signup-button" onClick={handleSignup}>Signup</button>
+      <div className="switch-auth">
+        <p>Already have an account?</p>
+        <button onClick={handleSwitchToLogin}>Switch to Login</button>
+      </div>
     </div>
   );
 }

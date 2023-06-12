@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
-import './App.css'; // Import CSS file for styling
+import { BrowserRouter, Routes, Route, Link, NavLink, Navigate, useLocation } from 'react-router-dom';
+import './App.css';
 import { auth } from './config/firebase';
 import Login from './Components/Login/login';
 import Signup from './Components/Signup/signup';
@@ -18,18 +18,14 @@ function App() {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Add authentication state change listener
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in, update the user state
+      if (user && user.emailVerified) {
         setUser(user);
       } else {
-        // User is signed out, set the user state to null
         setUser(null);
       }
     });
 
-    // Cleanup the listener on unmount
     return () => unsubscribe();
   }, []);
 
@@ -37,11 +33,9 @@ function App() {
     auth
       .signOut()
       .then(() => {
-        // User is signed out, handle any additional cleanup or redirection
         console.log('User signed out');
       })
       .catch((error) => {
-        // An error occurred while signing out
         console.log('Error signing out:', error);
       });
   };
@@ -56,26 +50,35 @@ function App() {
 
   const PrivateRoute = ({ element, path }) => {
     if (!user) {
-      // User is not logged in, redirect to the login page
-      return <Navigate to="/home" />;
+      return <Navigate to="/hotel_app_client/login" />;
     }
-
-    // User is logged in, render the specified element
+  
+    // Check if the user's email is verified
+    const isEmailVerified = user.emailVerified;
+  
+    if (!isEmailVerified) {
+      return <Navigate to="/hotel_app_client/verify-email" />;
+    }
+  
     return element;
   };
-
+  function VerifyEmail() {
+    return (
+      <div>
+        <h2>Email Verification</h2>
+        <p>Please verify your email address. Check your inbox for a verification link.</p>
+      </div>
+    );
+  }
+  
   return (
     <BrowserRouter>
       <nav>
         <label htmlFor="menu-toggle" className="menu-icon" onClick={toggleMobileMenu}>
-          {isMobileMenuOpen ? (
-            <CgClose className="icon" />
-          ) : (
-            <CgMenuRound className="icon" />
-          )}
+          {isMobileMenuOpen ? <CgClose className="icon" /> : <CgMenuRound className="icon" />}
         </label>
         <div className="logo">
-          <Link to="/" onClick={closeMobileMenu}>
+          <Link to="/hotel_app_client" onClick={closeMobileMenu}>
             Logo
           </Link>
         </div>
@@ -83,38 +86,38 @@ function App() {
           {user && (
             <>
               <li>
-                <Link to="/" onClick={closeMobileMenu}>
+                <NavLink to="/hotel_app_client" onClick={closeMobileMenu} activeClassName="active">
                   Home
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/profile" onClick={closeMobileMenu}>
+                <NavLink to="/hotel_app_client/profile" onClick={closeMobileMenu} activeClassName="active">
                   Profile
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/settings" onClick={closeMobileMenu}>
+                <NavLink to="/hotel_app_client/settings" onClick={closeMobileMenu} activeClassName="active">
                   Settings
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/book" onClick={closeMobileMenu}>
+                <NavLink to="/hotel_app_client/book" onClick={closeMobileMenu} activeClassName="active">
                   Book
-                </Link>
+                </NavLink>
               </li>
             </>
           )}
           {!user ? (
             <>
               <li>
-                <Link to="/login" onClick={closeMobileMenu}>
+                <NavLink to="/hotel_app_client/login" onClick={closeMobileMenu} activeClassName="active">
                   Login
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/signup" onClick={closeMobileMenu}>
+                <NavLink to="/hotel_app_client/signup" onClick={closeMobileMenu} activeClassName="active">
                   Signup
-                </Link>
+                </NavLink>
               </li>
             </>
           ) : (
@@ -126,23 +129,26 @@ function App() {
       </nav>
 
       <Suspense fallback={<Loader />}>
-        <Routes>
-          {!user ? (
-            <>
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="*" element={<HomeOffline />} />
-            </>
-          ) : (
-            <>
-              <Route path="/" element={<Home />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/book" element={<Book />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </>
-          )}
-        </Routes>
+      <Routes>
+  {!user ? (
+    <>
+      <Route path="/hotel_app_client" element={<HomeOffline />} />
+      <Route path="/hotel_app_client/login" element={<Login />} />
+      <Route path="/hotel_app_client/signup" element={<Signup />} />
+      <Route path="/hotel_app_client/verify-email" element={<VerifyEmail />} />
+      <Route path="/hotel_app_client/*" element={<Navigate to="/hotel_app_client" />} />
+    </>
+  ) : (
+    <>
+      <Route path="/hotel_app_client" element={<Home />} />
+      <Route path="/hotel_app_client/profile" element={<Profile />} />
+      <Route path="/hotel_app_client/settings" element={<Settings />} />
+      <Route path="/hotel_app_client/book" element={<Book />} />
+      <Route path="/hotel_app_client/*" element={<Navigate to="/hotel_app_client" />} />
+    </>
+  )}
+</Routes>
+
       </Suspense>
     </BrowserRouter>
   );

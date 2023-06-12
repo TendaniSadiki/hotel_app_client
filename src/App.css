@@ -36,7 +36,7 @@
     transform: rotate(360deg);
   }
 }
-/* App.css */
+
 /* App.css */
 
 nav {
@@ -81,14 +81,14 @@ nav {
 }
 
 /* Mobile Menu Styling */
+
 @media (max-width: 768px) {
   .menu-icon {
     display: block;
-    
     top: 10px;
     right: 10px;
     z-index: 2;
-        }
+  }
 
   .menu {
     display: none;
@@ -121,8 +121,10 @@ nav {
     color: #fff;
   }
 
+  /* Updated selector for active route */
   .menu a.active {
-    background-color: #000;
+    background-color: #333;
     color: #fff;
   }
+  
 }

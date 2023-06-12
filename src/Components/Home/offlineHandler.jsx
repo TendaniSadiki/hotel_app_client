@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../../config/firebase';
-
 import {
   collection,
   getDocs,
@@ -16,8 +15,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper';
 
 import 'swiper/swiper.min.css';
+
 import Footer from '../Footer/footer';
 import Loader from '../Loader/Loader';
+import Login from '../Login/login';
+import Signup from '../Signup/signup';
 
 SwiperCore.use([Navigation, Pagination, Autoplay]);
 
@@ -25,7 +27,7 @@ const HomeOffline = () => {
   const [rooms, setRooms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [activeStep, setActiveStep] = useState(null); // 'login' or 'signup'
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const swiperRef = useRef(null);
@@ -67,15 +69,17 @@ const HomeOffline = () => {
   }, []);
 
   const goToPrevious = () => {
-    setCurrentSlide((prevSlide) =>
-      prevSlide === 0 ? roomHeaderImages.length - 1 : prevSlide - 1
-    );
+    if (swiperRef.current && swiperRef.current.swiper) {
+      swiperRef.current.swiper.slidePrev();
+      swiperRef.current.swiper.autoplay.start();
+    }
   };
 
   const goToNext = () => {
-    setCurrentSlide((prevSlide) =>
-      prevSlide === roomHeaderImages.length - 1 ? 0 : prevSlide + 1
-    );
+    if (swiperRef.current && swiperRef.current.swiper) {
+      swiperRef.current.swiper.slideNext();
+      swiperRef.current.swiper.autoplay.start();
+    }
   };
 
   const roomHeaderImages = rooms.map((room) => room.images[0]);
@@ -90,7 +94,19 @@ const HomeOffline = () => {
   }, [currentSlide]);
 
   const handleRoomCardClick = () => {
-    setShowLoginModal(true);
+    setActiveStep('login');
+  };
+
+  const handleSwitchToSignup = () => {
+    setActiveStep('signup');
+  };
+
+  const handleSwitchToLogin = () => {
+    setActiveStep('login');
+  };
+
+  const handleCloseModal = () => {
+    setActiveStep(null);
   };
 
   return (
@@ -122,6 +138,8 @@ const HomeOffline = () => {
 
       <h2>Rooms</h2>
 
+      {error && <p className="error-message">{error}</p>}
+
       <div className="room-container">
         {isLoading ? (
           <Loader />
@@ -146,11 +164,23 @@ const HomeOffline = () => {
         )}
       </div>
 
-      {showLoginModal && (
-        // Render the login modal component here
-        // You can replace the following line with your login modal component
-        <div className="login-modal">Login Modal</div>
-      )}
+      {activeStep && (
+  <div className="auth-modal">
+    <button className="close-button" onClick={handleCloseModal}>x</button>
+    {activeStep === 'signup' ? (
+      <>
+        <Signup handleSwitchToLogin={handleSwitchToLogin} />
+      </>
+    ) : (
+      <>
+        <Login handleSwitchToSignup={handleSwitchToSignup} />
+      </>
+    )}
+  </div>
+)}
+
+
+
 
       <Footer />
     </div>

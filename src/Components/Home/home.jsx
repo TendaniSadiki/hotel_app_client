@@ -38,6 +38,7 @@ const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false); // New state variable for the payment modal
   const [confirmPriceClicked, setConfirmPriceClicked] = useState(false); // Track if "Confirm price" button is clicked
+  const [numOfNights, setNumOfNights] = useState(0); 
   const swiperRef = useRef(null);
 
   useEffect(() => {
@@ -137,7 +138,8 @@ const Home = () => {
 
     const totalPrice = selectedRoom.price * nights;
     setTotalPrice(totalPrice);
-    setConfirmPriceClicked(true); // Set the "Confirm price" button clicked
+    setNumOfNights(nights); // Update the number of nights
+    setConfirmPriceClicked(true);
     setError(null);
 
     // Rest of the code...
@@ -336,6 +338,7 @@ const Home = () => {
             >
               Continue with payment
             </button>
+            <p>Number of Nights: {numOfNights}</p> {/* Display the number of nights */}
             <p>Total Price: R{totalPrice}</p>
           </div>
         </div>

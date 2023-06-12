@@ -17,7 +17,7 @@
   }
   
   input {
-    width: 80%;
+    width: 100%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -50,5 +50,7 @@
       max-width: 100%;
       padding: 10px;
     }
+    input {
+      width:90%
+    }
   }
-  
