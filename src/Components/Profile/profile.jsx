@@ -129,7 +129,7 @@ export default function Profile() {
             Contact Number:
             {isEditMode ? (
               <input
-                type="text"
+                type="tel"
                 value={updatedContactNumber}
                 onChange={(e) => setUpdatedContactNumber(e.target.value)}
               />

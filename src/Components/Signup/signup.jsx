@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth, db } from '../../config/firebase';
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { db } from '../../config/firebase';
+import { collection, doc, setDoc } from 'firebase/firestore';
 import './signup.css';
 
-export default function Signup({ handleSwitchToLogin }) {
+export default function Signup({ handleSwitchToLogin, handleCloseModal }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -41,6 +41,11 @@ export default function Signup({ handleSwitchToLogin }) {
     }
   };
 
+  const handleSignupAndCloseModal = async () => {
+    await handleSignup();
+   
+  };
+
   return (
     <div className="signup-container">
       <h2>Signup</h2>
@@ -56,14 +61,16 @@ export default function Signup({ handleSwitchToLogin }) {
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        autoComplete='on'
       />
       <label>Password:</label>
       <input
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        autoComplete='on'
       />
-      <button className="signup-button" onClick={handleSignup}>Signup</button>
+      <button className="signup-button" onClick={handleSignupAndCloseModal}>Signup</button>
       <div className="switch-auth">
         <p>Already have an account?</p>
         <button onClick={handleSwitchToLogin}>Switch to Login</button>

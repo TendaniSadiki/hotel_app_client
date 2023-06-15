@@ -52,12 +52,14 @@ export default function Login({ handleSwitchToSignup, handleCloseModal }) {
       {error && <p className="error-message">{error}</p>}
       <label>Email:</label>
       <input
+      autoComplete='on'
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
       <label>Password:</label>
       <input
+      autoComplete='on'
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}

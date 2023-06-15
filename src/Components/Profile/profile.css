@@ -45,7 +45,10 @@
     .user-profile {
       grid-template-columns: 1fr;
     }
-    
+    .profile-image{
+      width: 130px;
+      height: 130px;
+    }
     .image-upload {
       text-align: center;
     }

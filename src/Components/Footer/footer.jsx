@@ -8,7 +8,7 @@ const Footer = () => {
         <p>&copy; {new Date().getFullYear()} Your Website. All rights reserved.</p>
         <ul className="footer-links">
           <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
+          <li><a href="/hotel_app_client/about">About</a></li>
           <li><a href="/services">Services</a></li>
           <li><a href="/contact">Contact</a></li>
         </ul>

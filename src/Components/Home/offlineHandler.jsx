@@ -166,7 +166,7 @@ const HomeOffline = () => {
 
       {activeStep && (
   <div className="auth-modal">
-    <button className="close-button" onClick={handleCloseModal}>x</button>
+    
     {activeStep === 'signup' ? (
       <>
         <Signup handleSwitchToLogin={handleSwitchToLogin} />
@@ -176,6 +176,7 @@ const HomeOffline = () => {
         <Login handleSwitchToSignup={handleSwitchToSignup} />
       </>
     )}
+    <button className="close-button" onClick={handleCloseModal}>x</button>
   </div>
 )}
 

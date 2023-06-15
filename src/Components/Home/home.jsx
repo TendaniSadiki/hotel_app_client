@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../../config/firebase';
+import { useCookies } from 'react-cookie';
 
 import {
   addDoc,
@@ -16,7 +17,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper';
-
+import {CgCloseO} from "react-icons/cg";
 import 'swiper/swiper.min.css';
 import Footer from '../Footer/footer';
 import Loader from '../Loader/Loader';
@@ -40,7 +41,10 @@ const Home = () => {
   const [confirmPriceClicked, setConfirmPriceClicked] = useState(false); // Track if "Confirm price" button is clicked
   const [numOfNights, setNumOfNights] = useState(0); 
   const swiperRef = useRef(null);
-
+  const [cookies, setCookie] = useCookies(['bookingCookie']);
+  const [paymentSuccessModalOpen, setPaymentSuccessModalOpen] = useState(false);
+  const [paymentFailureModalOpen, setPaymentFailureModalOpen] = useState(false);
+  console.log(cookies)
   useEffect(() => {
     // Fetch rooms data
     const fetchRooms = async () => {
@@ -144,6 +148,22 @@ const Home = () => {
 
     // Rest of the code...
   };
+// Function to handle payment success modal close
+const handlePaymentSuccessModalClose = () => {
+  setPaymentSuccessModalOpen(false);
+  setSelectedRoom(null);
+  setCheckInDate('');
+  setCheckOutDate('');
+  setUpdatedEmail('');
+  setTotalPrice(0);
+  setCurrentSlide(0);
+  setConfirmPriceClicked(false);
+};
+
+// Function to handle payment failure modal close
+const handlePaymentFailureModalClose = () => {
+  setPaymentFailureModalOpen(false);
+};
 
   const handlePayment = async () => {
     // Handle payment process
@@ -174,14 +194,15 @@ const Home = () => {
         cvv,
         timestamp: new Date().getTime(),
         roomStatus: roomStatus,
-        test:["1","2","3"]
+       
       });
-  
+      setCookie('bookingCookie', paymentRef.id, { path: '/' });
+      setPaymentSuccessModalOpen(true);
       // Display success message or perform any further actions
       console.log('Payment successful. Payment ID:', paymentRef.id);
     } catch (error) {
       console.log('Error saving payment:', error);
-      setError('Error saving payment');
+      setError('Error saving payment');setPaymentFailureModalOpen(true);
     }
   };
 
@@ -221,6 +242,9 @@ const Home = () => {
   }, [currentSlide]);
 
   return (
+    <div className="home-container">
+    <h1>Welcome</h1>
+
     <div className="container">
       <div className="mainCarousel">
         <Swiper
@@ -277,7 +301,7 @@ const Home = () => {
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={closeModal}>
-              &times;
+              <CgCloseO/>
             </span>
             <div className="carousel">
               <IoIosArrowBack
@@ -313,7 +337,7 @@ const Home = () => {
         <div className="booking-modal">
           <div className="booking-modal-content">
             <span className="close" onClick={closeModal}>
-              &times;
+              <CgCloseO/>
             </span>
             {error && <p>{error}</p>}
             <h2>Booking Details</h2>
@@ -355,7 +379,7 @@ const Home = () => {
           setError(null);
         }}
       >
-        &times;
+        <CgCloseO/>
       </span>
       <h2>Payment Details</h2>
       {error && <p>{error}</p>}
@@ -409,8 +433,25 @@ const Home = () => {
     </div>
   </div>
 )}
+{paymentSuccessModalOpen && (
+        <div className="payment-success-modal">
+          <div className="payment-success-modal-content">
+            <h2>Payment Successful!</h2>
+            <button onClick={handlePaymentSuccessModalClose}>Close</button>
+          </div>
+        </div>
+      )}
 
+      {paymentFailureModalOpen && (
+        <div className="payment-failure-modal">
+          <div className="payment-failure-modal-content">
+            <h2>Payment Failed!</h2>
+            <button onClick={handlePaymentFailureModalClose}>Close</button>
+          </div>
+        </div>
+      )}
 <Footer/>
+    </div>
     </div>
   );
 };
