@@ -10,13 +10,37 @@ import Book from './Components/Book/book';
 import Loader from './Components/Loader/Loader.jsx';
 import { CgMenuRound, CgClose } from 'react-icons/cg';
 import HomeOffline from './Components/Home/offlineHandler';
+import About from './Components/About/about';
 
 const Home = lazy(() => import('./Components/Home/home'));
 
 function App() {
   const [user, setUser] = useState(null);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
+  const openSignOutModal = () => {
+    setShowSignOutModal(true);
+    setMobileMenuOpen(false);
+  };
+
+  const closeSignOutModal = () => {
+    setShowSignOutModal(false);
+    setMobileMenuOpen(false);
+  };
+
+  const handleSignOut = () => {
+    
+    auth
+      .signOut()
+      .then(() => {
+        console.log('User signed out');
+        closeSignOutModal();
+      })
+      .catch((error) => {
+        console.log('Error signing out:', error);
+      });
+  };
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user && user.emailVerified) {
@@ -29,16 +53,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const handleSignOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        console.log('User signed out');
-      })
-      .catch((error) => {
-        console.log('Error signing out:', error);
-      });
-  };
+ 
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen((prevOpen) => !prevOpen);
@@ -62,6 +77,7 @@ function App() {
   
     return element;
   };
+
   function VerifyEmail() {
     return (
       <div>
@@ -122,33 +138,45 @@ function App() {
             </>
           ) : (
             <li>
-              <button onClick={handleSignOut}>Sign Out</button>
+              <button onClick={openSignOutModal}>Sign Out</button>
             </li>
           )}
         </ul>
       </nav>
 
       <Suspense fallback={<Loader />}>
-      <Routes>
-  {!user ? (
-    <>
-      <Route path="/hotel_app_client" element={<HomeOffline />} />
-      <Route path="/hotel_app_client/login" element={<Login />} />
-      <Route path="/hotel_app_client/signup" element={<Signup />} />
-      <Route path="/hotel_app_client/verify-email" element={<VerifyEmail />} />
-      <Route path="/hotel_app_client/*" element={<Navigate to="/hotel_app_client" />} />
-    </>
-  ) : (
-    <>
-      <Route path="/hotel_app_client" element={<Home />} />
-      <Route path="/hotel_app_client/profile" element={<Profile />} />
-      <Route path="/hotel_app_client/settings" element={<Settings />} />
-      <Route path="/hotel_app_client/book" element={<Book />} />
-      <Route path="/hotel_app_client/*" element={<Navigate to="/hotel_app_client" />} />
-    </>
-  )}
-</Routes>
-
+      {showSignOutModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Sign Out Confirmation</h2>
+            <p>Are you sure you want to sign out?</p>
+            <div className="modal-buttons">
+              <button onClick={handleSignOut} className='yesBtn'>Yes</button>
+              <button onClick={closeSignOutModal}>No</button>
+            </div>
+          </div>
+        </div>
+      )}
+        <Routes>
+          {!user ? (
+            <>
+              <Route path="/hotel_app_client" element={<HomeOffline />} />
+              <Route path="/hotel_app_client/login" element={<Login />} />
+              <Route path="/hotel_app_client/signup" element={<Signup />} />
+              <Route path="/hotel_app_client/about" element={<About />} />
+              <Route path="/hotel_app_client/verify-email" element={<VerifyEmail />} />
+              <Route path="/hotel_app_client/*" element={<Navigate to="/hotel_app_client" />} />
+            </>
+          ) : (
+            <>
+              <Route path="/hotel_app_client" element={<Home />} />
+              <Route path="/hotel_app_client/profile" element={<Profile />} />
+              <Route path="/hotel_app_client/settings" element={<Settings />} />
+              <Route path="/hotel_app_client/book" element={<Book />} />
+              <Route path="/hotel_app_client/*" element={<Navigate to="/hotel_app_client" />} />
+            </>
+          )}
+        </Routes>
       </Suspense>
     </BrowserRouter>
   );
